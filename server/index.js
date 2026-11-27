@@ -1,0 +1,16 @@
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import express from 'express';
+import { openDatabase } from './db.js';
+import { createApp } from './app.js';
+if (existsSync('.env')) process.loadEnvFile('.env');
+const db = openDatabase();
+const app = createApp(db);
+const root = resolve('dist');
+if (!existsSync(resolve(root, 'index.html'))) throw new Error('Build the interface first: npm run build');
+app.use(express.static(root, { index: false }));
+app.get('/', (req, res) => res.sendFile(resolve(root, 'index.html')));
+const port = Number(process.env.PORT || 4173), host = process.env.HOST || '127.0.0.1';
+const server = app.listen(port, host, () => console.log(`Nirmal is ready at ${process.env.APP_ORIGIN || `http://localhost:${port}`} (${host})`));
+const stop = () => server.close(() => { db.close(); process.exit(0); });
+process.on('SIGTERM', stop); process.on('SIGINT', stop);
