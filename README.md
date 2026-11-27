@@ -1,29 +1,81 @@
+<div align="center">
+
+<img src="public/mark.svg" width="72" height="72" alt="Nirmal logo">
+
 # Nirmal · निर्मल
 
-**Clean clothes. Clear process.**
+**Campus laundry tracking and complaint resolution**
 
-A campus laundry and complaint management application with dedicated student and administrator workspaces.
+[**Open the live app ↗**](https://nirmal-seven.vercel.app) · [**Watch the 2:26 demo ▶**](docs/Nirmal-Prototype-Demo.mp4) · [**Run locally**](#run-locally)
 
-## Project documentation
+[![Live on Vercel](https://img.shields.io/badge/Live_on-Vercel-203D30?logo=vercel)](https://nirmal-seven.vercel.app)
+[![React interface](https://img.shields.io/badge/Interface-React-203D30?logo=react)](src)
+[![Node.js 24 or newer](https://img.shields.io/badge/Local_runtime-Node.js_24%2B-203D30?logo=nodedotjs)](package.json)
 
-- [Project report](docs/PROJECT_REPORT.md): objectives, user roles, working process, technology, evaluation, and demonstration.
-- [System design and working specification](docs/SYSTEM_DESIGN.md): architecture and database diagrams, data dictionary, API contracts, screen design, security, analytics, and operations.
+</div>
 
-## Run on Windows
+Students can see where their laundry is, what happened at each handover, and who is handling a complaint. The laundry desk can assign bags, record each stage, and follow up on overdue cases from one workspace.
 
-Install **Node.js 24 or newer**, then double-click **START-NIRMAL.bat**. It installs locked dependencies when needed, builds the interface, seeds fictional records only when no default database file exists, and starts a server on the local computer.
+[**Screens**](#see-nirmal-in-action) · [**Workflows**](#how-it-works) · [**Setup**](#run-locally) · [**Architecture**](#architecture-and-checks)
 
-Open **http://localhost:4173**.
+## See Nirmal in action
 
-| Workspace | Email | Local demo password |
-| --- | --- | --- |
-| Student | student@nirmal.example | Nirmal-demo-2026! |
-| Administrator | admin@nirmal.example | Nirmal-demo-2026! |
-| Second student, for privacy checks | meera@nirmal.example | Nirmal-demo-2026! |
+[![Administrator dashboard showing registered students, active bags, open and resolved complaints, and items needing attention](docs/screenshots/admin-overview.png)](docs/screenshots/admin-overview.png)
 
-These accounts and all seeded names are fictional. Use this launcher for local demonstration only. Do not deploy the demonstration database.
+*The administrator dashboard summarizes current collections, complaints and items needing attention. All screenshots use fictional demo records. Select an image to open it at full size.*
 
-Terminal equivalent, from this directory:
+| Track a bag | Report a laundry problem |
+| --- | --- |
+| [![Student tracking view with seven laundry stages](docs/screenshots/bag-tracking.png)](docs/screenshots/bag-tracking.png) | [![Complaint form showing a selected bag and an evidence preview](docs/screenshots/complaint-form.png)](docs/screenshots/complaint-form.png) |
+| See the worker, target date, garment count and handover history. | Choose an assigned bag, describe the issue and attach an optional photo. |
+
+<details>
+<summary><strong>Explore the analytics and reports screen</strong></summary>
+
+[![Analytics dashboard with resolution, satisfaction and daily complaint metrics](docs/screenshots/analytics.png)](docs/screenshots/analytics.png)
+
+Administrators can inspect daily complaint volume, overdue cases, resolution time, student ratings and worker activity. The workspace supports CSV exports for further review.
+
+</details>
+
+## How it works
+
+| Student workspace | Administrator workspace |
+| --- | --- |
+| Register with a campus email, schedule collections, track assigned bags and check notifications. | Assign bags to active students, record handovers and attach a responsible worker to each stage. |
+| Submit a bag-linked complaint with optional evidence, follow the timeline, rate the outcome or reopen the issue. | Search the complaint queue, assign workers, record resolution notes and review service metrics. |
+
+<details>
+<summary><strong>Follow a laundry collection</strong></summary>
+
+1. An administrator assigns a bag to an active student.
+2. The student selects the bag and schedules a collection for 1–50 garments.
+3. The laundry desk records each worker handover and adds a note.
+4. The student checks the timeline and in-app updates. A delivered bag becomes available for another collection.
+
+```text
+Scheduled → Collected → Washing → Drying → Quality Check → Ready → Delivered
+```
+
+</details>
+
+<details>
+<summary><strong>Follow a complaint from submission to resolution</strong></summary>
+
+1. The student selects a bag, describes the issue and optionally attaches a JPEG or PNG up to 2 MiB.
+2. The server verifies bag ownership and creates a unique complaint reference.
+3. The administrator reviews the case, assigns a worker and records notes as the complaint advances.
+4. The student can rate the outcome or reopen a resolved or closed complaint. Reopening returns it to review and keeps the event history.
+
+```text
+Submitted → Under Review → Assigned → In Progress → Resolved → Closed
+```
+
+</details>
+
+## Run locally
+
+Requires **Node.js 24 or newer** and npm. On Windows, you can double-click [START-NIRMAL.bat](START-NIRMAL.bat) to install, build and launch the demo. From a terminal in the repository root, run:
 
 ```powershell
 npm ci
@@ -32,24 +84,20 @@ npm run demo
 npm start
 ```
 
-`npm run demo` refuses to seed a database that already contains accounts. Data survives restarts in `data/nirmal.sqlite`. Stop the server with Ctrl+C. After changing the interface, run `npm run build` again. `npm run dev` watches the server source; it does not rebuild the interface.
+Open [localhost:4173](http://localhost:4173). The demo seed fills an empty account database with fictional records.
 
-## What works
+| Local demo account | Email | Password |
+| --- | --- | --- |
+| Student | `student@nirmal.example` | `Nirmal-demo-2026!` |
+| Administrator | `admin@nirmal.example` | `Nirmal-demo-2026!` |
+| Second student | `meera@nirmal.example` | `Nirmal-demo-2026!` |
 
-- Separate student and administrator accounts; registration, scrypt password hashing, eight-hour HttpOnly sessions, logout, password change, single-use password resets, role checks, and same-origin write protection.
-- Student overview, assigned bags, collection booking, recorded bag handovers, laundry history, complaint submission, complaint timeline, notifications, profile, and settings.
-- Administrative overview, complaint queue, bag assignment, sequential laundry operations, student activation/deactivation, worker creation/availability, reports, notifications, and service targets.
-- Complaint lifecycle: Submitted → Under Review → Assigned → In Progress → Resolved → Closed. Each administrative update requires a note. Students can rate resolutions and reopen unresolved complaints for review.
-- JPEG/PNG evidence up to 2 MiB and 12 megapixels, preview/removal, real upload progress, server-side pixel decoding, resizing to a maximum 1600-pixel edge, and metadata-free PNG storage. Evidence is accessible only to the owner and administrators.
-- Server-side bag ownership and student record isolation. Integer versions reject stale updates. State changes, events, and notifications commit together.
-- Reports calculated from stored data: registered students, active bags, pending/in-progress/resolved/overdue complaints, average resolution duration, satisfaction, worker activity, and daily trends. CSV export escapes formula-like cells.
-- Original SVG mark, CSS laundry illustrations, self-hosted Inter, Lucide icons, Motion transitions, responsive layouts, dark mode, collapsible sidebar, Ctrl/Cmd+K page navigation, loading/empty states, toasts, and native confirmation dialogs.
+Use separate browser profiles or a private window to keep student and administrator sessions open at once. The hosted app uses a separate database and administrator password. New registrations on the live site use a full `@bennett.edu.in` email address.
 
-Use separate browser profiles for simultaneous student and administrator sessions. The application does not use a role-switching demo button.
+<details>
+<summary><strong>Configure a fresh installation and password resets</strong></summary>
 
-## Fresh installation without demo data
-
-Run `npm ci` and `npm run build`, copy `.env.example` to `.env`, and configure the campus email domain and origin. Start with a new database path. Create the first administrator using a password supplied through the process environment:
+Copy [`.env.example`](.env.example) to `.env` and configure the application origin, a fresh database path and the registration domain. The domain setting uses `bennett.edu.in` without the leading `@`. Build the app with `npm run build`, then provision an administrator:
 
 ```powershell
 $securePassword = Read-Host 'New administrator password (12+ characters)' -AsSecureString
@@ -59,48 +107,23 @@ Remove-Item Env:NIRMAL_ADMIN_PASSWORD
 npm start
 ```
 
-Students register through the sign-in screen. Administrators add workers and assign bags through the workspace. Role selection is never accepted from student registration input.
+Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` and `MAIL_FROM` to enable email delivery for password resets. A local operator can also generate a one-time link after verifying the account owner with `npm run admin -- reset student@your-university.edu`. Share reset links privately.
 
-## Password reset delivery
+</details>
 
-Configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, and `MAIL_FROM` in `.env`. Reset links use `APP_ORIGIN`, expire after 30 minutes, and revoke existing sessions when redeemed. Password reset requests return the same response for known and unknown accounts when mail is configured. SMTP errors are logged without tokens or passwords.
+## Architecture and checks
 
-Without SMTP, the form explains that delivery is unavailable. An operator with local database access can generate a reset link after verifying the account owner:
-
-```powershell
-npm run admin -- reset student@your-university.edu
-```
-
-Deliver the link privately. It is a credential; do not put it in tickets or public logs. Real SMTP delivery has not been tested in this environment; integration tests use a captured test transport.
-
-## Architecture
-
-`src/` contains the original React interface. `server/app.js` defines HTTP endpoints and authorization. `server/db.js` creates the relational SQLite schema and transaction helper. `server/security.js` handles validation and password/session primitives. `server/images.js` decodes and re-encodes evidence. `scripts/` provides explicit provisioning and notice generation.
-
-The API and compiled client use a single origin and one server. The default listener is loopback only. The SQLite database uses foreign keys, WAL, uniqueness constraints, and a single active collection per bag. Images are database blobs; no user-controlled upload filenames are served. Passwords are salted hashes, and session/reset secrets are stored only as SHA-256 digests. The browser stores only the theme preference in localStorage.
-
-## Verification and remaining limits
+| Layer | Implementation |
+| --- | --- |
+| Interface | React, Vite, Inter, Lucide and Motion |
+| API | Express on Node.js with role checks, session cookies and server-side ownership checks |
+| Storage | SQLite for local development and Turso for the Vercel deployment |
+| Hosting | Vercel serves the client and routes API requests to the backend |
 
 ```powershell
-npm test
-npm run check:ui
-npm run build
-npm audit
+npm test          # API workflows, account isolation, images and persistence
+npm run check:ui  # Student, administrator and authentication render checks
+npm run build     # Production assets and dependency notices
 ```
 
-Verified in this workspace:
-
-- Nine tests covering account boundaries, roles, CSRF rejection, sessions, collection lifecycle, complaint lifecycle, stale writes, private evidence, image rejection/resize, feedback, reopening, password resets, settings, activation, notification ownership, and persistence.
-- Thirty-four server-render checks of populated/empty student/admin pages and authentication views.
-- Production build and HTTP health/root responses.
-- npm audit reported zero known dependency vulnerabilities at installation time. This is not a security certification.
-
-The browser access host was unavailable, so browser interaction, responsive visual layout, and accessibility have **not** been visually verified. Render checks are not a substitute for browser tests.
-
-This is a runnable, production-oriented foundation, not a certified production deployment. Before a public campus launch, configure HTTPS and secure cookies (`NODE_ENV=production`), validate mail delivery and email ownership, add campus SSO/MFA as appropriate, establish backups and retention policy, run load/security/browser/accessibility checks, and review operational requirements. SQLite uses Node's currently experimental built-in API; pin and test your Node version. The current schema bootstrap is for new installations; future schema changes need versioned migrations. The synchronous database/image processing and in-memory rate limiter are intended for a single modest instance, not a horizontally scaled deployment. Lists currently load campus records in full; large campuses need pagination and query limits. Notifications are in-app and refresh every 30 seconds; no push/SMS or background SLA escalation is implemented. JPEG EXIF orientation is discarded rather than applied. This application does not reuse or provide a new native Flutter client, QR scanning, OTP handover, or AI classification.
-
-## Source and licensing
-
-See [PROVENANCE.md](PROVENANCE.md) for the application?s assets and dependencies.
-
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) preserves installed dependency notices, including the Inter font license and Lucide attribution. The build also publishes them at `/third-party-notices.txt`. Regenerate with `npm run licenses` when dependencies or installation platforms change. The project's own distribution license has deliberately not been assigned on your behalf; `private: true` prevents accidental npm publication. Preserve third-party terms independently of whichever license you choose for your application.
+Read the [project report](docs/PROJECT_REPORT.md) for objectives, scope and the demo walkthrough. The [system design](docs/SYSTEM_DESIGN.md) covers the database, state transitions, API routes and metrics. Asset details and dependency notices are in [Provenance](PROVENANCE.md) and [Third-party notices](THIRD_PARTY_NOTICES.md).
