@@ -6,9 +6,9 @@
 
 **Campus laundry tracking and complaint resolution**
 
-[**Open the live app ↗**](https://nirmal-seven.vercel.app) · [**Watch the 2:26 demo ▶**](docs/Nirmal-Prototype-Demo.mp4) · [**Run locally**](#run-locally)
+[**Open the live app ↗**](https://nirmal-seven.vercel.app/) · [**Watch the 2:26 demo ▶**](docs/Nirmal-Prototype-Demo.mp4)
 
-[![Live on Vercel](https://img.shields.io/badge/Live_on-Vercel-203D30?logo=vercel)](https://nirmal-seven.vercel.app)
+[![Live on Vercel](https://img.shields.io/badge/Live_on-Vercel-203D30?logo=vercel)](https://nirmal-seven.vercel.app/)
 [![React interface](https://img.shields.io/badge/Interface-React-203D30?logo=react)](src)
 [![Node.js 24 or newer](https://img.shields.io/badge/Local_runtime-Node.js_24%2B-203D30?logo=nodedotjs)](package.json)
 
@@ -16,7 +16,7 @@
 
 Students can see where their laundry is, what happened at each handover, and who is handling a complaint. The laundry desk can assign bags, record each stage, and follow up on overdue cases from one workspace.
 
-[**Screens**](#see-nirmal-in-action) · [**Workflows**](#how-it-works) · [**Setup**](#run-locally) · [**Architecture**](#architecture-and-checks)
+[**Screens**](#see-nirmal-in-action) · [**Workflows**](#how-it-works) · [**Get started**](#get-started) · [**Architecture**](#architecture-and-checks)
 
 ## See Nirmal in action
 
@@ -73,43 +73,11 @@ Submitted → Under Review → Assigned → In Progress → Resolved → Closed
 
 </details>
 
-## Run locally
+## Get started
 
-Requires **Node.js 24 or newer** and npm. On Windows, you can double-click [START-NIRMAL.bat](START-NIRMAL.bat) to install, build and launch the demo. From a terminal in the repository root, run:
+**Live website**  [https://nirmal-seven.vercel.app/](https://nirmal-seven.vercel.app/)
 
-```powershell
-npm ci
-npm run build
-npm run demo
-npm start
-```
-
-Open [localhost:4173](http://localhost:4173). The demo seed fills an empty account database with fictional records.
-
-| Local demo account | Email | Password |
-| --- | --- | --- |
-| Student | `student@nirmal.example` | `Nirmal-demo-2026!` |
-| Administrator | `admin@nirmal.example` | `Nirmal-demo-2026!` |
-| Second student | `meera@nirmal.example` | `Nirmal-demo-2026!` |
-
-Use separate browser profiles or a private window to keep student and administrator sessions open at once. The hosted app uses a separate database and administrator password. New registrations on the live site use a full `@bennett.edu.in` email address.
-
-<details>
-<summary><strong>Configure a fresh installation and password resets</strong></summary>
-
-Copy [`.env.example`](.env.example) to `.env` and configure the application origin, a fresh database path and the registration domain. The domain setting uses `bennett.edu.in` without the leading `@`. Build the app with `npm run build`, then provision an administrator:
-
-```powershell
-$securePassword = Read-Host 'New administrator password (12+ characters)' -AsSecureString
-$env:NIRMAL_ADMIN_PASSWORD = [System.Net.NetworkCredential]::new('', $securePassword).Password
-npm run admin -- create admin@your-university.edu "Campus Administrator"
-Remove-Item Env:NIRMAL_ADMIN_PASSWORD
-npm start
-```
-
-Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` and `MAIL_FROM` to enable email delivery for password resets. A local operator can also generate a one-time link after verifying the account owner with `npm run admin -- reset student@your-university.edu`. Share reset links privately.
-
-</details>
+Students can select **Create an account** and register with their full `@bennett.edu.in` email address. Once the laundry desk assigns a bag, it appears under **My laundry** and in the complaint form.
 
 ## Architecture and checks
 
