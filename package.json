@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=24.0.0" },
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "scripts": {
     "dev": "node --watch server/index.js",
     "start": "node server/index.js",
@@ -16,16 +18,19 @@
   },
   "dependencies": {
     "@fontsource/inter": "5.3.0",
+    "@libsql/client": "0.18.0",
     "express": "5.3.0",
     "express-rate-limit": "8.7.5",
     "helmet": "8.3.0",
+    "jpeg-js": "0.4.4",
     "lucide-react": "1.82.0",
     "motion": "14.14.0",
     "nodemailer": "10.6.1",
+    "pngjs": "7.0.0",
     "react": "19.3.1",
-    "react-dom": "19.3.1",
-    "jpeg-js": "0.4.4",
-    "pngjs": "7.0.0"
+    "react-dom": "19.3.1"
   },
-  "devDependencies": { "vite": "8.4.0" }
+  "devDependencies": {
+    "vite": "8.4.0"
+  }
 }
